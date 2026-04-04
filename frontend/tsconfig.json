@@ -6,6 +6,7 @@
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
     "skipLibCheck": true,
+     "jsx": "react-jsx", // React 17+ JSX transform
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -17,7 +18,7 @@
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false, // need false for devloping stage. Allow unused parameters for better DX with React components
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
