@@ -1,0 +1,1 @@
+// UpdatePasswordPage.tsx placeholder
