@@ -4,11 +4,11 @@ const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection failed: ', err));
+// mongoose.connect(process.env.MONGODB_URI)
+//     .then(() => console.log('MongoDB connected'))
+//     .catch(err => console.error('MongoDB connection failed: ', err));
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -24,11 +24,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/auth', authRouter);
-app.use('/products', productRouter);
-app.use('/cart', cartRouter);
+// app.use('/', indexRouter);
+// app.use('/users', usersRouter);
+// app.use('/auth', authRouter);
+// app.use('/products', productRouter);
+// app.use('/cart', cartRouter);
+app.use('/api', indexRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/products', productRouter);
+app.use('/api/cart', cartRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
