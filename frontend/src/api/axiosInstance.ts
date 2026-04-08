@@ -2,7 +2,7 @@
 import axios from 'axios'
 // create an axios instance so every API can use it and the setting is centralized.
 const axiosInstance = axios.create({
-    baseURL: 'api',
+    baseURL: '/api',
     timeout: 10000, // 10 sec
     headers: {'Content-Type': 'application/json'}}) // tell the backend(web server- express) we are sending json data, and the backend can parse it correctly. 
 
@@ -23,7 +23,7 @@ axiosInstance.interceptors.response.use(
   (response) => response, // success response with 2xx code, just return it, do not need to do anything.
   (error) => {
     // 401 = Unauthorized, which means the token is invalid or expired, we need to remove the token and user info from localStorage, and redirect to signin page.
-    if (error.response ?.status ==- 401) {
+    if (error.response ?.status == 401) {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         window.location.href = '/signin'
