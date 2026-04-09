@@ -21,11 +21,11 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   try {
     const product = new Product({
       ...req.body,
-      createdBy: "65f000000000000000000000",
+      createdBy: req.user._id,
     });
 
     await product.save();
@@ -34,41 +34,58 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// router.post("/", authMiddleware, async (req, res) => {
-//   try {
-//     const product = new Product({
-//       ...req.body,
-//       createdBy: req.user._id,
-//     });
 
-//     await product.save();
+// router.put("/:id", async (req, res) => {
+//   try {
+//     console.log("current user:", req.user); //log
+
+//     const product = await Product.findByIdAndUpdate(
+//       req.params.id,
+//       req.body,
+//       { new: true }
+//     );
 //     res.json(product);
 //   } catch (err) {
 //     res.status(500).json({ error: err.message });
 //   }
 // });
-
-router.put("/:id", async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
-    console.log("current user:", req.user); //log
+    const product = await Product.findById(req.params.id);
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    if (!product || !product.isActive) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (product.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "Not authorized to update this product" });
+    }
+
+    Object.assign(product, req.body);
+    await product.save();
+
     res.json(product);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
-    await Product.findByIdAndUpdate(req.params.id, {
-      isActive: false
-    });
-    res.json({ success: true });
+    const product = await Product.findById(req.params.id);
+
+    if (!product || !product.isActive) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (product.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "Not authorized to delete this product" });
+    }
+
+    product.isActive = false;
+    await product.save();
+
+    res.json({ success: true, message: "Product deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
