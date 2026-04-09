@@ -4,11 +4,11 @@ const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-// mongoose.connect(process.env.MONGODB_URI)
-//     .then(() => console.log('MongoDB connected'))
-//     .catch(err => console.error('MongoDB connection failed: ', err));
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection failed: ', err));
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -31,7 +31,7 @@ app.use(cookieParser());
 // app.use('/cart', cartRouter);
 app.use('/api', indexRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/auth', authRouter);
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
 

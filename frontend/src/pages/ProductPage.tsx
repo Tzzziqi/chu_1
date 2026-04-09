@@ -6,11 +6,14 @@ import { Button, Card, Col, Row, Spin, Empty, Alert, Typography } from "antd";
 
 const { Title, Text } = Typography;
 
+
 function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -46,7 +49,24 @@ function ProductPage() {
 
   return (
     <div style={{ padding: "24px" }}>
-      <Title level={2}>Products</Title>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px",
+        }}
+      >
+        <Title level={2} style={{ margin: 0 }}>
+          Products
+        </Title>
+
+        {isAdmin && (
+          <Button type="primary" onClick={() => navigate("/products/new")}>
+            Add Product
+          </Button>
+        )}
+      </div>
 
       {products.length === 0 ? (
         <Empty description="No products found" />
@@ -66,22 +86,9 @@ function ProductPage() {
                   ) : undefined
                 }
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "24px",
-                  }}
-                >
-                  <Title level={2} style={{ margin: 0 }}>
-                    Products
-                  </Title>
-
-                  <Button type="primary" onClick={() => navigate("/products/new")}>
-                    Add Product
-                  </Button>
-                </div>
+                <Title level={4} style={{ marginBottom: "8px" }}>
+                  {product.name}
+                </Title>
                 <Text type="secondary">{product.category}</Text>
                 <br />
                 <Text>{product.description}</Text>
@@ -90,6 +97,17 @@ function ProductPage() {
                 <Text strong>Price: ${product.price}</Text>
                 <br />
                 <Text>Stock: {product.stock}</Text>
+                <br />
+                <br />
+                {isAdmin ? (
+                  <Button onClick={() => navigate(`/products/${product._id}/edit`)}>
+                    Edit
+                  </Button>
+                ) : (
+                  <Button type="primary">
+                    Add to Cart
+                  </Button>
+                )}
               </Card>
             </Col>
           ))}
