@@ -17,7 +17,7 @@ const CONFIG = {
     },
     signup: {
         title: 'Sign up for an account',
-        buttonText:'Sign up',
+        buttonText:'Create account',
         fields: ['email', 'password', 'confirmPassword'] as const,
     },
     'update-password': {
@@ -211,21 +211,16 @@ const handleSubmit = async () => {
                 </Box>
             )}
 
-            {mode === 'signin' && (
+            {mode === 'signup' && (
                 <Box sx={{ textAlign: 'center', fontSize: 13 }}>
                     <Typography variant="body2" sx={{ mb: 0.5 }}>
-                    Already have an account?{' '}
+                    Already have an account? Sign in please{' '}
                     <Box component="span" sx={{ color: '#6C63FF', cursor: 'pointer' }}
                         onClick={() => navigate('/signin')}>
                         Sign in
                     </Box>
                     </Typography>
-                    <Typography variant="body2">
-                    <Box component="span" sx={{ color: '#6C63FF', cursor: 'pointer' }}
-                        onClick={() => navigate('/update-password')}>
-                        Forgot password?
-                    </Box>
-                    </Typography>
+                    
                 </Box>
             )}
             {error && (
