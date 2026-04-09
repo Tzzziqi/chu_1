@@ -12,7 +12,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const authRouter = require('./routes/auth');
+const authRoutes = require('./routes/authRoutes');
 const productRouter = require('./routes/products');
 const cartRouter = require('./routes/cart');
 
@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/', indexRouter);
+
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/products', productRouter);
