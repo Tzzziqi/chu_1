@@ -15,13 +15,18 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
+
+    if (!product || !product.isActive) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
     res.json(product);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const product = new Product({
       ...req.body,
@@ -35,30 +40,12 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-// router.put("/:id", async (req, res) => {
-//   try {
-//     console.log("current user:", req.user); //log
-
-//     const product = await Product.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       { new: true }
-//     );
-//     res.json(product);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
     if (!product || !product.isActive) {
       return res.status(404).json({ error: "Product not found" });
-    }
-
-    if (product.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "Not authorized to update this product" });
     }
 
     Object.assign(product, req.body);
@@ -70,16 +57,12 @@ router.put("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
     if (!product || !product.isActive) {
       return res.status(404).json({ error: "Product not found" });
-    }
-
-    if (product.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "Not authorized to delete this product" });
     }
 
     product.isActive = false;

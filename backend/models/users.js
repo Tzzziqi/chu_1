@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema(
 
 // encrypt password before saving
 // pre(save) is a middleware that runs before saving a document. We use it to hash the password before storing it in the database.
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     // newest mongonDB does not support next() when you write pre('save) with asycn function. it treat next as a noramal function not callback f.
@@ -41,4 +41,4 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('users', userSchema);
+module.exports = mongoose.model('User', userSchema);
