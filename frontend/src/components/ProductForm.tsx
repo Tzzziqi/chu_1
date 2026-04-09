@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button, Form, Input, InputNumber, Switch } from "antd";
 import type { ProductPayload } from "../types/product";
 
@@ -5,31 +6,32 @@ type ProductFormProps = {
   initialValues?: ProductPayload;
   loading?: boolean;
   onFinish: (values: ProductPayload) => void;
+  isEdit?: boolean;
 };
 
 function ProductForm({
   initialValues,
   loading = false,
   onFinish,
+  isEdit = false,
 }: ProductFormProps) {
   const [form] = Form.useForm();
 
+  useEffect(() => {
+    form.setFieldsValue({
+      name: "",
+      description: "",
+      category: "",
+      price: 0,
+      stock: 0,
+      imageUrl: "",
+      isActive: true,
+      ...initialValues,
+    });
+  }, [initialValues, form]);
+
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      initialValues={{
-        name: "",
-        description: "",
-        category: "",
-        price: 0,
-        stock: 0,
-        imageUrl: "",
-        isActive: true,
-        ...initialValues,
-      }}
-      onFinish={onFinish}
-    >
+    <Form form={form} layout="vertical" onFinish={onFinish}>
       <Form.Item
         label="Product Name"
         name="name"
@@ -80,7 +82,7 @@ function ProductForm({
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>
-          Save Product
+          {isEdit ? "Update Product" : "Save Product"}
         </Button>
       </Form.Item>
     </Form>

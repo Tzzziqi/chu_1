@@ -1,27 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Alert, Card, Typography, message } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ProductForm from "../components/ProductForm";
-import { createProduct } from "../api/productApi";
+import { createProduct, getProductById, updateProduct  } from "../api/productApi";
 import type { ProductPayload } from "../types/product";
 
 const { Title } = Typography;
 
 function ProductFormPage() {
+  const { id } = useParams();
+  const isEdit = !!id;
+  const [initialValues, setInitialValues] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleCreate = async (values: ProductPayload) => {
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!isEdit || !id) return;
+
+      try {
+        setLoading(true);
+        const data = await getProductById(id);
+        setInitialValues(data);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, isEdit]);
+
+  const handleSubmit = async (values: ProductPayload) => {
     try {
       setLoading(true);
       setError("");
-      await createProduct(values);
-      message.success("Product created successfully");
+
+      if (isEdit && id) {
+        await updateProduct(id, values);
+        message.success("Product updated successfully");
+      } else {
+        await createProduct(values);
+        message.success("Product created successfully");
+      }
+
       navigate("/products");
     } catch (err) {
       console.error(err);
-      setError("Failed to create product");
+      setError(isEdit ? "Failed to update product" : "Failed to create product");
     } finally {
       setLoading(false);
     }
@@ -30,7 +59,7 @@ function ProductFormPage() {
   return (
     <div style={{ padding: "24px", maxWidth: "720px", margin: "0 auto" }}>
       <Card>
-        <Title level={2}>Create Product</Title>
+        <Title level={2}>{isEdit ? "Edit Product" : "Create Product"}</Title>
 
         {error && (
           <div style={{ marginBottom: "16px" }}>
@@ -38,10 +67,16 @@ function ProductFormPage() {
           </div>
         )}
 
-        <ProductForm loading={loading} onFinish={handleCreate} />
+        <ProductForm
+          loading={loading}
+          onFinish={handleSubmit}
+          initialValues={initialValues}
+          isEdit={isEdit}
+        />
       </Card>
     </div>
   );
 }
+
 
 export default ProductFormPage;
