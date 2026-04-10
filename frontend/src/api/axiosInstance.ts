@@ -1,5 +1,7 @@
 // for everyone to use axios instance 
 import axios from 'axios'
+import { store } from '../store'
+
 // create an axios instance so every API can use it and the setting is centralized.
 const axiosInstance = axios.create({
     baseURL: 'api',
@@ -9,7 +11,8 @@ const axiosInstance = axios.create({
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    // const token = localStorage.getItem('token')
+    const token = store.getState().auth.token // read from redux
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -24,8 +27,9 @@ axiosInstance.interceptors.response.use(
   (error) => {
     // 401 = Unauthorized, which means the token is invalid or expired, we need to remove the token and user info from localStorage, and redirect to signin page.
     if (error.response ?.status ==- 401) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
+        // localStorage.removeItem('token')
+        // localStorage.removeItem('user')
+        store.dispatch({ type: 'auth/logout '})
         window.location.href = '/signin'
     }
     return Promise.reject(error) // need to return the rejected promise, otherwise the error will not be propagated to the component that made the API call, and the component will not know that there is an error and cannot show the error message to the user.

@@ -17,13 +17,13 @@ interface AuthState {
 
 // initialization. we want to check if there is a token in localStorage when the app starts, 
 // if there is, we set the user and token in the state, and set isLoggedIn to true. if there is no token, we set the user and token to null, and set isLoggedIn to false.
-const tokenFromStorage = localStorage.getItem('token')
-const userFromStorage = localStorage.getItem('user')
+// const tokenFromStorage = localStorage.getItem('token')
+// const userFromStorage = localStorage.getItem('user')
 
 const initialState: AuthState = {
-  user: userFromStorage ? JSON.parse(userFromStorage) : null,
-  token: tokenFromStorage || null,
-  isLoggedIn: !!tokenFromStorage, // double !! converts a truthy value to true and a falsy value to false
+  user: null,
+  token: null,
+  isLoggedIn: false,
   loading: false,
   error: null,
 }
@@ -35,8 +35,8 @@ export const signup = createAsyncThunk(
     try {
       const response = await authApi.signup(credentials) // call the API function, which will send a POST request to the backend, and return the response data, which contains the token and user info.
       // after singup, save user's info to local STorage so that the user can stay logged in even after refreshing the page.
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
+      // localStorage.setItem('token', response.data.token)
+      // localStorage.setItem('user', JSON.stringify(response.data.user))
       return response.data // return data to fulfilled's action payload
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Signup failed')
@@ -49,8 +49,8 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await authApi.signin(credentials)
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
+      // localStorage.setItem('token', response.data.token)
+      // localStorage.setItem('user', JSON.stringify(response.data.user))
       return response.data
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Login failed')
@@ -63,7 +63,7 @@ export const updatePassword = createAsyncThunk(
   async (passwords: { oldPassword: string; newPassword: string }, { rejectWithValue }) => {
     try {
       const response = await authApi.updatePassword(passwords) // call the upatePass API. Put request to backend, and return the response data, which contains the new token and user info.
-      localStorage.setItem('token', response.data.token)
+      // localStorage.setItem('token', response.data.token)
       return response.data
     } catch (error: any) { 
       return rejectWithValue(error.response?.data?.message || 'Update failed')
@@ -82,8 +82,8 @@ const authSlice = createSlice({
       state.token = null
       state.isLoggedIn = false
       state.error = null
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+      // localStorage.removeItem('token')
+      // localStorage.removeItem('user')
     },
     clearError: (state) => {
       state.error = null
