@@ -8,7 +8,7 @@ import './index.css'
 
 ReactDOM.createRoot(document.getElementById('app')!).render(
   <React.StrictMode>
-    <Provider store={store}> // make sure every component can accss to Redux
+    <Provider store={store}> {/*  make sure every component can accss to Redux*/}
       <BrowserRouter>
         <App />
       </BrowserRouter>
