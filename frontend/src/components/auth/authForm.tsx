@@ -1,29 +1,27 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { Box, TextField, Button, Typography, IconButton, InputAdornment } from '@mui/material'
-import { Visibility, VisibilityOff, Close } from '@mui/icons-material'
-import { message } from 'antd'
+import { Input, Button, Typography, message } from 'antd'
+import { CloseOutlined, MailOutlined } from '@ant-design/icons'
 import type { RootState, AppDispatch } from '../../store'
 import { login, signup, clearError } from '../../store/authSlice'
 
 
+
+const { Title, Text, Link } = Typography
 // the form setting.,
 const CONFIG = {
     signin: {
         title: 'Sign in to your account',
         buttonText:'Sign in',
-        fields: ['email', 'password'] as const 
     },
     signup: {
         title: 'Sign up for an account',
         buttonText:'Create account',
-        fields: ['email', 'password', 'confirmPassword'] as const,
     },
     'update-password': {
         title: 'Update your password',
         buttonText:'Update password',
-        fields: ['email'] as const,
     },
 }
 
@@ -41,7 +39,6 @@ export default function AuthForm({ mode }: AuthFormProps) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [showPassword, setShowPassword] = useState(false)
     const [emailSent, setEmailSent] = useState(false) // forget p and when email send, the page will change to alart page
     const [errors, setErrors] = useState<Record<string, string>>({}) //obj: key, vale is String, saved all false info
 
@@ -97,138 +94,144 @@ const handleSubmit = async () => {
     }
     }
 
-    // ===== password eye sigal: switch to + or - P
-    const passwordAdornment = (
-    <InputAdornment position="end">
-        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
-            {showPassword ? <VisibilityOff /> : <Visibility />}
-        </IconButton>
-    </InputAdornment>
-)
+    // Common stlyes for pages
+    const overlayStyle: React.CSSProperties = {
+        flex: 1, // footer/ header fill teh remaining space 
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    }
+
+    const cardStyle: React.CSSProperties = {
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 32,
+        maxWidth: 400,
+        width: '90%',
+        position: 'relative',
+    }
+
+    const closeButtonStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+    }
+
     // forgoet p and sent email logic...
     if (mode === 'update-password' && emailSent) {
-        return (
-            <Box sx={{
-                minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                bgcolor: 'rgba(0,0,0,0.5)',
-            }}>
-                <Box sx={{
-                    bgcolor: 'white', borderRadius: 2, p: 4, maxWidth: 400, width: '90%',
-                    textAlign: 'center', position: 'relative',
-                }}>
-                    <IconButton sx={{ position: 'absolute', top: 8, right: 8 }} onClick={() => navigate('/signin')}>
-                        <Close />
-                    </IconButton>
-                    <Typography variant="h6" sx={{ mb: 1 }}>Update your password</Typography>
-                    <Box sx={{ my: 3, fontSize: 48 }}>&#9993;</Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        We have sent the update password link to your email, please check that!
-                    </Typography>
-                </Box>
-            </Box>
-        )
-    }
+    return (
+      <div style={overlayStyle}>
+        <div style={{ ...cardStyle, textAlign: 'center' }}>
+          <Button
+            type="text" icon={<CloseOutlined />}
+            style={closeButtonStyle}
+            onClick={() => navigate('/signin')}
+          />
+          <Title level={4} style={{ marginBottom: 8 }}>Update your password</Title>
+          <MailOutlined style={{ fontSize: 48, color: '#6C63FF', margin: '24px 0' }} />
+          <Text type="secondary" style={{ display: 'block' }}>
+            We have sent the update password link to your email, please check that!
+          </Text>
+        </div>
+      </div>
+    )
+  }
 
     // ===== HomePage: singup/ signin/ forgetP Form ===== 
     return (
-        <Box sx={{
-            minHeight: '100vh', display:'flex',alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.5)',
-            }}> 
-            <Box sx={{ bgcolor: 'white', borderRadius: 2, p: 4, maxWidth: 400, width: '90%', position: 'relative',
-                }}>
+    <div style={overlayStyle}>
+      <div style={cardStyle}>
+        <Button
+          type="text" icon={<CloseOutlined />}
+          style={closeButtonStyle}
+          onClick={() => navigate('/')}
+        />
 
-            {/*  the closing buttom */}
-            <IconButton sx={{ position:'absolute', top: 8, right: 8 }} onClick={() => navigate('/')}><Close />
-            </IconButton>
-            
-            {/* Show the Title on Page depends on different mode === config.title */}
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, textAlign: 'center' }}>
-            {config.title}
-            </Typography>
-            
-            {/* emails for three models */}
-            <Typography variant= "body2" sx={{ mb: 0.5 }}>Email </Typography>
-            <TextField
-            fullWidth size="small" placeholder="Enter your email"
-            value={email} onChange={(e) => setEmail(e.target.value)}
-            error={!!errors.email}          
-            helperText={errors.email}       // show the error message at bottom the box
-            sx={{ mb: 2 }}
-            />
+        <Title level={4} style={{ textAlign: 'center', marginBottom: 24 }}>
+          {config.title}
+        </Title>
 
-            {mode !== 'update-password' && (
-                <>
-                <Typography variant="body2" sx={{ mb: 0.5 }}>Password</Typography>
-                <TextField
-                fullWidth size="small" placeholder="Enter your password"
-                type={showPassword ? 'text' : 'password'}  
-                value={password} onChange={(e) => setPassword(e.target.value)}
-                error={!!errors.password} helperText={errors.password} 
-                slotProps={{ input: { endAdornment: passwordAdornment } }}
-                sx={{ mb: 2 }}
-            />
-          </>
+        <div style={{ marginBottom: 16 }}>
+          <Text strong style={{ display: 'block', marginBottom: 4 }}>Email</Text>
+          <Input
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            status={errors.email ? 'error' : undefined}
+          />
+          {errors.email && (
+            <Text type="danger" style={{ fontSize: 12 }}>{errors.email}</Text>
           )}
-            {mode === 'signup' && (
-                <>
-                <Typography variant="body2" sx={{ mb: 0.5 }}>Password (Type your password again)</Typography>
-                <TextField
-                fullWidth size="small" placeholder="Confirm your password"
-                type={showPassword ? 'text' : 'password'}
-                value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                error={!!errors.confirmPassword} helperText={errors.confirmPassword}
-                slotProps={{ input: { endAdornment: passwordAdornment } }}
-                sx={{ mb: 2 }}
+        </div>
+
+        {mode !== 'update-password' && (
+          <div style={{ marginBottom: 16 }}>
+            <Text strong style={{ display: 'block', marginBottom: 4 }}>Password</Text>
+            <Input.Password
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              status={errors.password ? 'error' : undefined}
             />
-          </>
+            {errors.password && (
+              <Text type="danger" style={{ fontSize: 12 }}>{errors.password}</Text>
             )}
+          </div>
+        )}
 
-            <Button 
-                fullWidth variant="contained" onClick={handleSubmit}
-                disabled={loading} 
-                // textTransform: 'none' will help MUI change all butoom to capital 
-                sx={{ mb: 2, py: 1.2, textTransform: 'none', fontWeight: 600, bgcolor: '#6C63FF', '&:hover': { bgcolor: '#5A52D5' },        
+        {mode === 'signup' && (
+          <div style={{ marginBottom: 16 }}>
+            <Text strong style={{ display: 'block', marginBottom: 4 }}>Password (Please Type Your Password Again)</Text>
+            <Input.Password
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              status={errors.confirmPassword ? 'error' : undefined}
+            />
+            {errors.confirmPassword && (
+              <Text type="danger" style={{ fontSize: 12 }}>{errors.confirmPassword}</Text>
+            )}
+          </div>
+        )}
+
+        <Button
+          type="primary" block loading={loading}
+          onClick={handleSubmit}
+          style={{
+            height: 42, fontWeight: 600, marginBottom: 16,
+            backgroundColor: '#6C63FF', borderColor: '#6C63FF',
           }}
-            >
-                {loading ? 'Loading...' : config.buttonText}
-                </Button>
-            
-            {mode === 'signin' && (
-                <Box sx={{ textAlign: 'center', fontSize: 13 }}>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>
-                    Don't have an account?{' '}
-                    <Box component="span" sx={{ color: '#6C63FF', cursor: 'pointer' }}
-                        onClick={() => navigate('/signup')}>
-                        Sign up
-                    </Box>
-                    </Typography>
-                    <Typography variant="body2">
-                    <Box component="span" sx={{ color: '#6C63FF', cursor: 'pointer' }}
-                        onClick={() => navigate('/update-password')}>
-                        Forgot password?
-                    </Box>
-                    </Typography>
-                </Box>
-            )}
+        >
+          {config.buttonText}
+        </Button>
 
-            {mode === 'signup' && (
-                <Box sx={{ textAlign: 'center', fontSize: 13 }}>
-                    <Typography variant="body2" sx={{ mb: 0.5 }}>
-                    Already have an account? Sign in please{' '}
-                    <Box component="span" sx={{ color: '#6C63FF', cursor: 'pointer' }}
-                        onClick={() => navigate('/signin')}>
-                        Sign in
-                    </Box>
-                    </Typography>
-                    
-                </Box>
-            )}
-            {error && (
-                <Typography color="error" variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
-                    {error}
-                </Typography>
-            )}
-      </Box>
-      </Box>
-    )
+        {mode === 'signin' && (
+          <div style={{ textAlign: 'center' }}>
+            <Text>
+              Don't have an account?{' '}
+              <Link onClick={() => navigate('/signup')}>Sign up</Link>
+            </Text>
+            <br />
+            <Link onClick={() => navigate('/update-password')}>Forgot password?</Link>
+          </div>
+        )}
+
+        {mode === 'signup' && (
+          <div style={{ textAlign: 'center' }}>
+            <Text>
+              Already have an account?{' '}
+              <Link onClick={() => navigate('/signin')}>Sign in</Link>
+            </Text>
+          </div>
+        )}
+
+        {error && (
+          <Text type="danger" style={{ display: 'block', textAlign: 'center', marginTop: 8 }}>
+            {error}
+          </Text>
+        )}
+      </div>
+    </div>
+  )
 }

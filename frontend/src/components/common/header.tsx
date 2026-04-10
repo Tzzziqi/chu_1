@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { AppBar, Toolbar, Typography, Button, Box, IconButton, Badge } from '@mui/material'
-import { ShoppingCart } from '@mui/icons-material'
+import { Layout, Button, Badge, Space, Typography } from 'antd'
+import { ShoppingCartOutlined } from '@ant-design/icons'
 import type { RootState, AppDispatch } from '../../store'
 import { logout } from '../../store/authSlice'
+
+const { Header: AntHeader } = Layout
+const { Text } = Typography
 
 export default function Header() {
     const navigate = useNavigate()
@@ -14,48 +17,57 @@ export default function Header() {
         dispatch(logout())
         navigate('/signin')
     }
-    return (
-        <AppBar position="static" sx={{ bgcolor: '#1a1a2e' }}>
-            <Toolbar sx={{ justifyContent: 'space-between' }}>
-                <Typography
-                    variant="h6" 
-                    sx={{ fontWeight: 700, cursor: 'pointer' }}   
-                    onClick={() => navigate('/')}
-                    >
-                    Management
-                </Typography>
-                {/* rightside, the buttom area. */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                
-                {/* Render base on conditions */}
-                {isLoggedIn ? (
-                    <>
-                    <IconButton color="inherit" onClick={() => navigate('/cart')}>
-                    {/* need 队友 写 正确的badgeCOunt 这里我写死的 === 0 */}
-                    <Badge badgeContent={0} color="error">
-                        <ShoppingCart />
-                    </Badge>
-                </IconButton>
     
 
-                <Typography variant="body2">{user?.email}</Typography> {/* user?.email, if no email return undefined to avaiod error */}
-                    
-                   
-                    <Button color="inherit" size="small" onClick={handleLogout}> Sign out </Button>
-                    </>
-                ): (
-                   
-                    <>
-                    {/* Not register yet: display sign in + Sign up */}
-                    <Button color="inherit" size="small" onClick={() => navigate('/signin')}> Sign In</Button>
+    return (
+        <AntHeader
+        style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#1a1a2e',
+            padding: '0 24px',
+        }}
+        >
+        {/* Logo */}
+        <div
+            onClick={() => navigate('/')}
+            style={{
+            color: 'white',
+            fontSize: 18,
+            fontWeight: 700,
+            cursor: 'pointer',
+            }}
+        >
+            Management
+        </div>
 
-                    <Button variant="outlined" size="small" sx={{ color: 'white', borderColor: 'white' }} onClick={() => navigate('/signup')}> 
-                    Sign Up </Button>
-                    </>
-          )}
-        </Box>
-
-      </Toolbar>
-    </AppBar>
-  )
-}
+            {/* rightside, the buttom area. */}
+            <Space size="middle">
+            {isLoggedIn ? (
+            <>
+                <Badge count={0} size="small">
+                <ShoppingCartOutlined
+                    style={{ color: 'white', fontSize: 20, cursor: 'pointer' }}
+                    onClick={() => navigate('/cart')}
+                />
+                </Badge>
+                <Text style={{ color: 'white' }}>{user?.email}</Text>
+                <Button type="text" style={{ color: 'white' }} onClick={handleLogout}>
+                Sign out
+                </Button>
+            </>
+            ) : (
+            <>
+                <Button type="text" style={{ color: 'white' }} onClick={() => navigate('/signin')}>
+                Sign in
+                </Button>
+                <Button ghost onClick={() => navigate('/signup')}>
+                Sign up
+                </Button>
+            </>
+            )}
+        </Space>
+        </AntHeader>
+    )
+    }
