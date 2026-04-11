@@ -1,6 +1,6 @@
 // use controller to handle the logic of authentication
 const jwt = require('jsonwebtoken');
-const User = require('../models/users');
+const User = require('../models/User');
 
 
 const generateToken = (userId) => {

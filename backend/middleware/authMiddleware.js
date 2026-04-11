@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/users'); // check users' info from DB
+const User = require('../models/User'); // check users' info from DB
 
 //====== auth Middleware ======
 // it need put before the login === router.put. so valide the token > if it pass > then updatePassword
