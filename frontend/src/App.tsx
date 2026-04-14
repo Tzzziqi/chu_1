@@ -4,6 +4,8 @@ import ProductFormPage from "./pages/ProductFormPage";
 // import SignInPage from "./pages/SignInPage";
 // import SignUpPage from "./pages/SignUpPage";
 
+
+const { Content } = Layout
 function App() {
   return (
     <Routes>

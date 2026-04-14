@@ -1,5 +1,7 @@
 // for everyone to use axios instance 
 import axios from 'axios'
+import { store } from '../store'
+
 // create an axios instance so every API can use it and the setting is centralized.
 const axiosInstance = axios.create({
     baseURL: '/api',
@@ -9,7 +11,8 @@ const axiosInstance = axios.create({
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    // const token = localStorage.getItem('token')
+    const token = store.getState().auth.token // read from redux
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
