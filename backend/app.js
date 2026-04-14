@@ -2,9 +2,11 @@ require("dotenv").config();
 const cors = require('cors');
 const createError = require('http-errors');
 const express = require('express');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser'); 
+const logger = require('morgan'); 
+const mongoose = require('mongoose'); 
+const path = require("path");
+const uploadRouter = require("./routes/upload");
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connected'))
@@ -23,6 +25,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
@@ -34,7 +38,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
-
+app.use("/api/upload", uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

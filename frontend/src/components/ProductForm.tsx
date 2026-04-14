@@ -1,6 +1,8 @@
-import { useEffect } from "react";
-import { Button, Form, Input, InputNumber, Switch } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Form, Input, InputNumber, Switch, Upload, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import type { ProductPayload } from "../types/product";
+import { uploadProductImage } from "../api/productApi";
 
 type ProductFormProps = {
   initialValues?: ProductPayload;
@@ -16,6 +18,7 @@ function ProductForm({
   isEdit = false,
 }: ProductFormProps) {
   const [form] = Form.useForm();
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     form.setFieldsValue({
@@ -29,6 +32,22 @@ function ProductForm({
       ...initialValues,
     });
   }, [initialValues, form]);
+
+  const handleUpload = async (file: File) => {
+  try {
+    setUploading(true);
+    const imageUrl = await uploadProductImage(file);
+    form.setFieldValue("imageUrl", imageUrl);
+    message.success("Image uploaded successfully");
+  } catch (error) {
+    console.error(error);
+    message.error("Failed to upload image");
+  } finally {
+    setUploading(false);
+  }
+
+  return false;
+};
 
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -73,7 +92,40 @@ function ProductForm({
       </Form.Item>
 
       <Form.Item label="Image URL" name="imageUrl">
-        <Input placeholder="Enter image URL" />
+        <Input placeholder="Uploaded image URL will appear here" />
+      </Form.Item>
+
+      <Form.Item label="Upload Image">
+        <Upload
+          beforeUpload={(file) => {
+            handleUpload(file);
+            return false;
+          }}
+          showUploadList={false}
+          accept="image/*"
+        >
+          <Button icon={<UploadOutlined />} loading={uploading}>
+            Upload Image
+          </Button>
+        </Upload>
+      </Form.Item>
+
+      <Form.Item shouldUpdate>
+        {() => {
+          const imageUrl = form.getFieldValue("imageUrl");
+          return imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="preview"
+              style={{
+                width: "160px",
+                marginTop: "8px",
+                borderRadius: "8px",
+                objectFit: "cover",
+              }}
+            />
+          ) : null;
+        }}
       </Form.Item>
 
       <Form.Item label="Active" name="isActive" valuePropName="checked">

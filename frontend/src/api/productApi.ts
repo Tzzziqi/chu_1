@@ -27,3 +27,16 @@ export const updateProduct = async (
 export const deleteProduct = async (id: string): Promise<void> => {
   await axiosInstance.delete(`/products/${id}`);
 };
+
+export const uploadProductImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await axiosInstance.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data.imageUrl;
+};
