@@ -12,6 +12,7 @@ import {
   Button,
   Row,
   Col,
+  Space,
 } from "antd";
 
 const { Title, Text, Paragraph } = Typography;
@@ -65,6 +66,12 @@ function ProductDetailPage() {
 
   return (
     <div style={{ padding: "24px" }}>
+      <Space style={{ marginBottom: "16px" }}>
+        <Button onClick={() => navigate("/products")}>
+          ← Back to Products
+        </Button>
+      </Space>
+      
       <Row gutter={24}>
         {/* 左边：图片 */}
         <Col xs={24} md={12}>
