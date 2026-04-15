@@ -1,25 +1,37 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProductPage from "./pages/ProductPage";
 import ProductFormPage from "./pages/ProductFormPage";
-// import SignInPage from "./pages/SignInPage";
-// import SignUpPage from "./pages/SignUpPage";
+import { Layout } from "antd";
+import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage";
+import Header from "./components/common/header";
+import Footer from "./components/common/footer";
+import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 
 
-const { Content } = Layout
+const { Content } = Layout;
+
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/products" replace />} />
+    <Layout style={{ minHeight: "100vh" }}>
+      <Header />
 
-      <Route path="/products" element={<ProductPage />} />
-      
-      <Route path="/products/new" element={<ProductFormPage />} />
+      <Content style={{ padding: "24px" }}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/products" replace />} />
 
-      <Route path="/products/:id/edit" element={<ProductFormPage />} />
+          <Route path="/products" element={<ProductPage />} />
+          <Route path="/products/new" element={<ProductFormPage />} />
+          <Route path="/products/:id/edit" element={<ProductFormPage />} />
 
-      {/* <Route path="/signin" element={<SignInPage />} />
-      <Route path="/signup" element={<SignUpPage />} /> */}
-    </Routes>
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/update-password" element={<UpdatePasswordPage />} />
+        </Routes>
+      </Content>
+
+      <Footer />
+    </Layout>
   );
 }
 

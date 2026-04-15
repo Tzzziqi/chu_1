@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { getAllProducts } from "../api/productApi";
 import type { Product } from "../types/product";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../store";
 import { Button, Card, Col, Row, Spin, Empty, Alert, Typography } from "antd";
 
 const { Title, Text } = Typography;
@@ -12,7 +14,7 @@ function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const user = useSelector((state: RootState) => state.auth.user);
   const isAdmin = user?.role === "admin";
 
   useEffect(() => {
