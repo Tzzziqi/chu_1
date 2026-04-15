@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Alert, Card, Typography, message } from "antd";
+import { Alert, Card, Typography, message, Button, Space } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import ProductForm from "../components/ProductForm";
 import { createProduct, getProductById, updateProduct  } from "../api/productApi";
@@ -58,6 +58,11 @@ function ProductFormPage() {
 
   return (
     <div style={{ padding: "24px", maxWidth: "720px", margin: "0 auto" }}>
+      <Space style={{ marginBottom: "16px" }}>
+        <Button onClick={() => navigate("/products")}>
+          ← Back to Products
+        </Button>
+      </Space>
       <Card>
         <Title level={2}>{isEdit ? "Edit Product" : "Create Product"}</Title>
 
