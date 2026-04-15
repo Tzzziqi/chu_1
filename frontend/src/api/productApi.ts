@@ -1,8 +1,10 @@
 import axiosInstance from "./axiosInstance";
-import type { Product, ProductPayload } from "../types/product";
+import type { Product, ProductPayload, GetProductsParams, ProductListResponse} from "../types/product";
 
-export const getAllProducts = async (): Promise<Product[]> => {
-  const res = await axiosInstance.get("/products");
+export const getAllProducts = async (
+  params: GetProductsParams = {}
+): Promise<ProductListResponse> => {
+  const res = await axiosInstance.get("/products", { params });
   return res.data;
 };
 

@@ -7,6 +7,7 @@ import SignUpPage from "./pages/SignUpPage";
 import Header from "./components/common/header";
 import Footer from "./components/common/footer";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 
 const { Content } = Layout;
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<Navigate to="/products" replace />} />
 
           <Route path="/products" element={<ProductPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/products/new" element={<ProductFormPage />} />
           <Route path="/products/:id/edit" element={<ProductFormPage />} />
 

@@ -4,20 +4,63 @@ const Product = require("../models/Product");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
 
-router.get("/", async (req, res) => {
+const getSortOption = (sort) => {
+  switch (sort) {
+    case "price_asc":
+      return { price: 1 };
+    case "price_desc":
+      return { price: -1 };
+    case "last_added":
+    default:
+      return { createdAt: -1 };
+  }
+};
+
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const products = await Product.find({ isActive: true });
-    res.json(products);
+    const isAdmin = req.user?.role === "admin";
+
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit, 10) || 8, 1);
+    const search = (req.query.search || "").trim();
+    const sort = req.query.sort || "last_added";
+
+    const filter = isAdmin ? {} : { isActive: true };
+
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
+
+    const sortOption = getSortOption(sort);
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      Product.find(filter).sort(sortOption).skip(skip).limit(limit),
+      Product.countDocuments(filter),
+    ]);
+
+    res.json({
+      products,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
+    const isAdmin = req.user?.role === "admin";
 
-    if (!product || !product.isActive) {
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (!product.isActive && !isAdmin) {
       return res.status(404).json({ error: "Product not found" });
     }
 
@@ -29,10 +72,16 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const product = new Product({
+    const productData = {
       ...req.body,
       createdBy: req.user._id,
-    });
+    };
+
+    if (Number(productData.stock) === 0) {
+      productData.isActive = false;
+    }
+
+    const product = new Product(productData);
 
     await product.save();
     res.json(product);
@@ -45,11 +94,16 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (!product || !product.isActive) {
+    if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
     Object.assign(product, req.body);
+
+    if (Number(product.stock) === 0) {
+      product.isActive = false;
+    }
+
     await product.save();
 
     res.json(product);

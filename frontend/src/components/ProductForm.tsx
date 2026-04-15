@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Input, InputNumber, Switch, Upload, message } from "antd";
+import { Button, Form, Input, InputNumber, Switch, Upload, message, Space } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import type { ProductPayload } from "../types/product";
 import { uploadProductImage } from "../api/productApi";
@@ -34,20 +34,25 @@ function ProductForm({
   }, [initialValues, form]);
 
   const handleUpload = async (file: File) => {
-  try {
-    setUploading(true);
-    const imageUrl = await uploadProductImage(file);
-    form.setFieldValue("imageUrl", imageUrl);
-    message.success("Image uploaded successfully");
-  } catch (error) {
-    console.error(error);
-    message.error("Failed to upload image");
-  } finally {
-    setUploading(false);
-  }
+    try {
+      setUploading(true);
+      const imageUrl = await uploadProductImage(file);
+      form.setFieldValue("imageUrl", imageUrl);
+      message.success("Image uploaded successfully");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
 
-  return false;
-};
+    return false;
+  };
+
+  const handleRemoveImage = () => {
+    form.setFieldValue("imageUrl", "");
+    message.success("Image removed");
+  };
 
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -114,16 +119,21 @@ function ProductForm({
         {() => {
           const imageUrl = form.getFieldValue("imageUrl");
           return imageUrl ? (
-            <img
-              src={imageUrl}
-              alt="preview"
-              style={{
-                width: "160px",
-                marginTop: "8px",
-                borderRadius: "8px",
-                objectFit: "cover",
-              }}
-            />
+            <Space direction="vertical" size="middle">
+              <img
+                src={imageUrl}
+                alt="preview"
+                style={{
+                  width: "160px",
+                  marginTop: "8px",
+                  borderRadius: "8px",
+                  objectFit: "cover",
+                }}
+              />
+              <Button danger onClick={handleRemoveImage}>
+                Remove Image
+              </Button>
+            </Space>
           ) : null;
         }}
       </Form.Item>

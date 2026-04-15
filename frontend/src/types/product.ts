@@ -21,3 +21,18 @@ export interface ProductPayload {
   imageUrl: string;
   isActive?: boolean;
 }
+
+export interface GetProductsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort?: "last_added" | "price_asc" | "price_desc";
+}
+
+export interface ProductListResponse {
+  products: Product[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
