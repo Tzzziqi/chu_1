@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { getAllProducts } from "../api/productApi";
+import { getAllProducts, deleteProduct } from "../api/productApi";
 import type { Product } from "../types/product";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store";
 import { Button, Card, Col, Row, Spin, Empty, Alert, Typography,
-  Input, Select, Pagination, Space, } from "antd";
+  Input, Select, Pagination, Space, Popconfirm, message} from "antd";
 
 const { Title, Text } = Typography;
 
@@ -15,9 +15,9 @@ function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("last_added");
+  const [sort, setSort] = useState<"last_added" | "price_asc" | "price_desc">("last_added");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const pageSize = 8;
   const [total, setTotal] = useState(0);
   const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
   const navigate = useNavigate();
@@ -40,37 +40,54 @@ function ProductPage() {
     }));
   };
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError("");
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const data = await getAllProducts({
-          page,
-          limit: pageSize,
-          search,
-          sort,
+      const data = await getAllProducts({
+        page,
+        limit: pageSize,
+        search,
+        sort,
+      });
+
+      setProducts(data.products);
+      setTotal(data.total);
+
+      setQuantityMap((prev) => {
+        const nextQuantityMap: Record<string, number> = {};
+        data.products.forEach((product: Product) => {
+          nextQuantityMap[product._id] = prev[product._id] || 1;
         });
+        return nextQuantityMap;
+      });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load products");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setProducts(data.products);
-        setTotal(data.total);
+  const handleDelete = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      message.success("Product deleted successfully");
 
-        setQuantityMap((prev) => {
-          const nextQuantityMap: Record<string, number> = {};
-          data.products.forEach((product: Product) => {
-            nextQuantityMap[product._id] = prev[product._id] || 1;
-          });
-          return nextQuantityMap;
-        });
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load products");
-      } finally {
-        setLoading(false);
+      if (products.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+        return;
       }
-    };
 
+      fetchProducts();
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to delete product");
+    }
+  };
+
+  useEffect(() => {
     fetchProducts();
   }, [page, pageSize, search, sort]);
 
@@ -174,16 +191,30 @@ function ProductPage() {
                   </Title>
 
                   <Text strong style={{ fontSize: "16px" }}>
-                    Price: ${product.price}
+                    ${product.price}
                   </Text>
 
                   <br />
                   <br />
 
                   {isAdmin ? (
-                    <Button onClick={() => navigate(`/products/${product._id}/edit`)}>
-                      Edit
-                    </Button>
+                    <Space>
+                      <Button onClick={() => navigate(`/products/${product._id}/edit`)}>
+                        Edit
+                      </Button>
+
+                      <Popconfirm
+                        title="Delete product"
+                        description="Are you sure you want to delete this product?"
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={() => handleDelete(product._id)}
+                      >
+                        <Button danger>
+                          Delete
+                        </Button>
+                      </Popconfirm>
+                    </Space>
                   ) : (
                     <>
                       <div
@@ -255,8 +286,6 @@ function ProductPage() {
                 setPage(nextPage);
                 setPageSize(nextPageSize);
               }}
-              showSizeChanger
-              pageSizeOptions={["4", "8", "12", "16"]}
             />
           </div>
         </>

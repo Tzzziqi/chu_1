@@ -114,14 +114,11 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res) => {
 
 router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
 
-    if (!product || !product.isActive) {
+    if (!deletedProduct) {
       return res.status(404).json({ error: "Product not found" });
     }
-
-    product.isActive = false;
-    await product.save();
 
     res.json({ success: true, message: "Product deleted successfully" });
   } catch (err) {
