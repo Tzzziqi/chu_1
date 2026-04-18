@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../store";
 import { Button, Card, Col, Row, Spin, Empty, Alert, Typography,
   Input, Select, Pagination, Space, Popconfirm, message} from "antd";
+import AddToCartButton from "../components/Cart/AddToCartButton";
 
 const { Title, Text } = Typography;
 
@@ -191,7 +192,7 @@ function ProductPage() {
                   </Title>
 
                   <Text strong style={{ fontSize: "16px" }}>
-                    ${product.price}
+                    ${product.price.toFixed(2)}
                   </Text>
 
                   <br />
@@ -216,61 +217,10 @@ function ProductPage() {
                       </Popconfirm>
                     </Space>
                   ) : (
-                    <>
-                      <div
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          border: "1px solid #d9d9d9",
-                          borderRadius: "8px",
-                          overflow: "hidden",
-                          marginBottom: "12px",
-                        }}
-                      >
-                        <Button
-                          type="text"
-                          onClick={() => handleDecrease(product._id)}
-                          style={{ borderRadius: 0 }}
-                        >
-                          -
-                        </Button>
-
-                        <div
-                          style={{
-                            minWidth: "40px",
-                            textAlign: "center",
-                            fontWeight: 500,
-                          }}
-                        >
-                          {quantityMap[product._id] || 1}
-                        </div>
-
-                        <Button
-                          type="text"
-                          onClick={() => handleIncrease(product._id, product.stock)}
-                          style={{ borderRadius: 0 }}
-                        >
-                          +
-                        </Button>
-                      </div>
-
-                      <br />
-
-                      <Button
-                        type="primary"
-                        onClick={() => {
-                          if (!isLoggedIn) {
-                            navigate("/signin");
-                            return;
-                          }
-
-                          const quantity = quantityMap[product._id] || 1;
-                          console.log("Add to cart:", product._id, "quantity:", quantity);
-                        }}
-                      >
-                        Add to Cart
-                      </Button>
-                    </>
+                        <AddToCartButton
+                          productId = {product._id}
+                          price = {product.price}
+                        />
                   )}
                 </Card>
               </Col>

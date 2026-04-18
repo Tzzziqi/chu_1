@@ -4,10 +4,10 @@ import { configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
 // import storage from 'redux-persist/lib/storage'
 import { combineReducers } from '@reduxjs/toolkit'
-import authReducer from './authSlice'
+import authReducer from './slices/authSlice'
+import cartReducer from './slices/cartSlice'
 // 队友后面加：
 // import productReducer from './productSlice'
-// import cartReducer from './cartSlice'
 
 // because the commonJs and ES Module compatibility problems, has to hand write the storge, import it's not working
 const storage = {
@@ -26,7 +26,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer, // refresh the page, still remember your info
   // product: productReducer,
-  // cart: cartReducer,
+  cart: cartReducer,
 })
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Input, Button, Typography, message } from 'antd'
 import { CloseOutlined, MailOutlined } from '@ant-design/icons'
 import type { RootState, AppDispatch } from '../../store'
-import { login, signup, clearError } from '../../store/authSlice'
+import { login, signup } from '../../store/slices/authSlice'
 
 
 
