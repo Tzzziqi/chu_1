@@ -1,19 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getProductById } from "../api/productApi";
 import type { Product } from "../types/product";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store";
-import {
-    Card,
-    Typography,
-    Spin,
-    Alert,
-    Button,
-    Row,
-    Col,
-    Space,
-} from "antd";
+import { Alert, Button, Card, Col, Row, Space, Spin, Typography, } from "antd";
 import AddToCartButton from "../components/Cart/AddToCartButton.tsx";
 
 const { Title, Text, Paragraph } = Typography;
@@ -112,8 +103,10 @@ function ProductDetailPage() {
                     {/* user */ }
                     { !isAdmin && (
                         <AddToCartButton
-                            productId = {product._id}
-                            price = {product.price}
+                            productId={ product._id }
+                            price={ product.price }
+                            stock={ product.stock }
+                            fromCart={ false }
                         />
                     ) }
 

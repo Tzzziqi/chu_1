@@ -18,11 +18,39 @@ export const getCart = createAsyncThunk(
     }
 );
 
+export const getCartWithPromo = createAsyncThunk(
+    'cart/getCartWithPromo',
+    async (promotionCode: string, thunkAPI) => {
+        try {
+            return await cartService.getCart(promotionCode);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                return thunkAPI.rejectWithValue(error.message);
+            }
+            return thunkAPI.rejectWithValue('Unknown error');
+        }
+    }
+);
+
 export const updateItemQuantity = createAsyncThunk(
     'cart/updateItemQuantity',
     async (props: UpdateItemProps, thunkAPI) => {
         try {
             return await cartService.updateItemQuantity(props);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                return thunkAPI.rejectWithValue(error.message);
+            }
+            return thunkAPI.rejectWithValue('Unknown error');
+        }
+    }
+);
+
+export const clearCart = createAsyncThunk(
+    'cart/clearCart',
+    async (_, thunkAPI) => {
+        try {
+            return await cartService.clearCart();
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 return thunkAPI.rejectWithValue(error.message);
@@ -66,6 +94,32 @@ const cartSlice = createSlice({
             state.items = [];
             state.summary = emptySummary;
         },
+        updateQuantityOptimistically: (state, action) => {
+            const { productId, quantity, price, stock } = action.payload;
+
+            if (!state.backupSummary) {
+                state.backupItems = JSON.parse(JSON.stringify(state.items));
+                state.backupSummary = JSON.parse(JSON.stringify(state.summary));
+            }
+
+            const item = state.items.find(item => item.product._id === productId);
+            let currentSubtotal = Number(state.summary.subtotal);
+            let currentItemTotalCount = Number(state.summary.itemTotalCount);
+
+            if (item) {
+                const quantityDiff = quantity - item.quantity;
+                currentSubtotal += quantityDiff * price;
+                currentItemTotalCount += quantityDiff;
+                item.quantity = quantity;
+            } else if (price) {
+                currentSubtotal += quantity * price;
+                currentItemTotalCount += quantity;
+                state.items.push({ product: { _id: productId, price: price.toFixed(2), stock }, quantity });
+            }
+
+            state.summary.subtotal = currentSubtotal.toFixed(2);
+            state.summary.itemTotalCount = currentItemTotalCount;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -83,32 +137,23 @@ const cartSlice = createSlice({
                 state.error = action.payload as string;
             })
 
-            // updateItemQuantity
-            .addCase(updateItemQuantity.pending, (state, action) => {
+            // getCartWithPromo
+            .addCase(getCartWithPromo.pending, (state) => {
                 state.status = 'loading';
-                if (!state.backupSummary) {
-                    state.backupItems = JSON.parse(JSON.stringify(state.items));
-                    state.backupSummary = JSON.parse(JSON.stringify(state.summary));
-                }
+            })
+            .addCase(getCartWithPromo.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.items = action.payload.items;
+                state.summary = action.payload.summary;
+            })
+            .addCase(getCartWithPromo.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload as string;
+            })
 
-                const { productId, quantity, price } = action.meta.arg;
-                const item = state.items.find(item => item.product._id === productId);
-                let currentSubtotal = Number(state.summary.subtotal);
-                let currentItemTotalCount = Number(state.summary.itemTotalCount);
-
-                if (item) {
-                    const quantityDiff = quantity - item.quantity;
-                    currentSubtotal += quantityDiff * price;
-                    currentItemTotalCount += quantityDiff;
-                    item.quantity = quantity;
-                } else if (price) {
-                    currentSubtotal += quantity * price;
-                    currentItemTotalCount += quantity;
-                    state.items.push({product:{_id: productId, price: price.toFixed(2)}, quantity});
-                }
-
-                state.summary.subtotal = currentSubtotal.toFixed(2);
-                state.summary.itemTotalCount = currentItemTotalCount;
+            // updateItemQuantity
+            .addCase(updateItemQuantity.pending, (state) => {
+                state.status = 'loading';
             })
             .addCase(updateItemQuantity.fulfilled, (state, action) => {
                 state.status = 'succeeded';
@@ -127,8 +172,22 @@ const cartSlice = createSlice({
                 }
                 state.error = action.payload as string;
             })
+
+            // clearCart
+            .addCase(clearCart.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(clearCart.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.items = action.payload.items;
+                state.summary = action.payload.summary;
+            })
+            .addCase(clearCart.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload as string;
+            })
     },
 });
 
-export const { clearCartState } = cartSlice.actions;
+export const { clearCartState, updateQuantityOptimistically } = cartSlice.actions;
 export default cartSlice.reducer;

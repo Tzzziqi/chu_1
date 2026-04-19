@@ -14,8 +14,8 @@ const validateCart = (req, res, next) => {
     }
 
     if (quantity !== undefined) {
-        if (typeof quantity !== 'number' || !Number.isInteger(quantity) || quantity < 0 || quantity > 99) {
-            return res.status(400).json({ error: "Item quantity must be an integer between 1 and 99" });
+        if (typeof quantity !== 'number' || !Number.isInteger(quantity) || quantity < 0 || quantity > 20) {
+            return res.status(400).json({ error: "Item quantity must be an integer between 1 and 20" });
         }
     } else {
         return res.status(400).json({ error: "Missing item quantity" });

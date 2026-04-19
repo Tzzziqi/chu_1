@@ -1,7 +1,13 @@
-import { Drawer, List, Typography, Button, Input, Divider, Space, Spin } from 'antd';
-import { CloseOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store";
+import { Button, Divider, Drawer, List, Popconfirm, Space, Spin, Typography } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../store";
+import PromoCodeInput from "./ApplyPromoButton";
+import RemoveItem from "./RemoveItemFromCartButton";
+import AddToCartButton from "./AddToCartButton";
+import styled from "styled-components";
+import { clearCart } from "../../store/slices/cartSlice";
+import toast from "react-hot-toast";
 
 const { Text } = Typography;
 
@@ -10,14 +16,54 @@ interface CartDrawerProps {
     onClose: () => void;
 }
 
+
 const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
+    const dispatch = useDispatch<AppDispatch>();
+
+
+    const ClearTheCart = async () => {
+        try {
+            await dispatch(clearCart()).unwrap();
+            toast.dismiss();
+            toast.success('Successfully clear the cart!', {
+                duration: 3000,
+            });
+        } catch {
+            toast.dismiss();
+            toast.error('Failed to clear the cart!', {
+                duration: 3000,
+                position: 'top-center',
+            });
+        }
+    }
 
     const { items, summary, status } = useSelector((state: RootState) => state.cart);
 
     return (
         <Drawer
-            title={ <div style={ { color: 'white', fontSize: '18px', fontWeight: 'bold' } }>Cart
-                ({ summary.itemTotalCount })</div> }
+            title={
+                <HeaderContainer>
+                    <TitleText>
+                        Cart ({ summary.itemTotalCount })
+                    </TitleText>
+                    { items.length > 0 && (
+                        <Popconfirm
+                            title='Clear the cart?'
+                            description='This will remove all the items in your cart.'
+                            onConfirm={ ClearTheCart }
+                            okText='Yes, Clear'
+                            cancelText='No'
+                            okButtonProps={ { danger: true } }
+                        >
+                            <ClearButton type="text" size="small">
+                                Clear All
+                            </ClearButton>
+                        </Popconfirm>
+                    ) }
+
+                </HeaderContainer>
+
+            }
             placement="right"
             onClose={ onClose }
             open={ isOpen }
@@ -27,21 +73,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
 
             footer={
                 <div style={ { padding: '12px 20px 20px 20px', backgroundColor: '#ffffff' } }>
-                    <div style={ { marginBottom: '24px' } }>
-                        <Text type="secondary"
-                              style={ { fontSize: '13px', display: 'block', marginBottom: '8px', color: '#8c8c8c' } }>
-                            Promo Code
-                        </Text>
-                        <div style={ { display: 'flex', gap: '8px' } }>
-                            <Input placeholder="20 DOLLAR OFF" style={ { height: '42px' } }/>
-                            <Button
-                                type="primary"
-                                style={ { height: '42px', padding: '0 25px', backgroundColor: '#5c67f2' } }
-                            >
-                                Apply
-                            </Button>
-                        </div>
-                    </div>
+                    <PromoCodeInput/>
 
                     <Divider style={ { margin: '0 0 20px 0' } }/>
 
@@ -149,36 +181,16 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                                         justifyContent: 'space-between',
                                         alignItems: 'center'
                                     } }>
-                                        <div style={ {
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            border: '1px solid #d9d9d9',
-                                            borderRadius: '4px',
-                                            height: '32px'
-                                        } }>
-                                            <Button
-                                                type="text"
-                                                size="small"
-                                                icon={ <MinusOutlined style={ { fontSize: '10px' } }/> }
-                                            />
-                                            <span style={ {
-                                                padding: '0 12px',
-                                                fontSize: '14px',
-                                                minWidth: '40px',
-                                                textAlign: 'center'
-                                            } }>
-                                            { item.quantity }
-                                        </span>
-                                            <Button
-                                                type="text"
-                                                size="small"
-                                                icon={ <PlusOutlined style={ { fontSize: '10px' } }/> }
-                                            />
-                                        </div>
-                                        <Button type="link" size="small"
-                                                style={ { color: '#8c8c8c', textDecoration: 'underline' } }>
-                                            Remove
-                                        </Button>
+                                        <AddToCartButton
+                                            productId={ item.product._id }
+                                            price={ Number(item.product.price) }
+                                            stock={ item.product.stock }
+                                            fromCart={ true }
+                                        />
+
+                                        <RemoveItem
+                                            productId={ item.product._id }
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -192,3 +204,34 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
 };
 
 export default CartDrawer;
+
+const TitleText = styled.div`
+    color: white;
+    fontSize: 18px;
+    font-weight: bold;
+`;
+
+const ClearButton = styled(Button)`
+    &.ant-btn-text {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 13px;
+        padding: 0 8px;
+        height: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 4px;
+
+        &:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: white !important;
+        }
+    }
+`;
+
+const HeaderContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-right: 32px;
+`;

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ProductPage from "./pages/ProductPage";
 import ProductFormPage from "./pages/ProductFormPage";
 import { Layout } from "antd";
@@ -19,7 +19,7 @@ function App() {
             <Header/>
 
             <Content style={ { padding: "24px" } }>
-                <Toaster />
+                <Toaster/>
                 <Routes>
                     <Route path="/" element={ <Navigate to="/products" replace/> }/>
 

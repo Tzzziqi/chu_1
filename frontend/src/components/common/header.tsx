@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import { Layout, Button, Badge, Space, Typography } from 'antd'
+import { useDispatch, useSelector } from 'react-redux'
+import { Badge, Button, Layout, Space, Typography } from 'antd'
 import { ShoppingCartOutlined } from '@ant-design/icons'
-import type { RootState, AppDispatch } from '../../store'
+import type { AppDispatch, RootState } from '../../store'
 import { logout } from '../../store/slices/authSlice'
 import { useEffect, useState } from "react";
 import { getCart } from "../../store/slices/cartSlice";
