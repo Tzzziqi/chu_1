@@ -17,11 +17,8 @@ function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [quantity, setQuantity] = useState(1);
-
     const user = useSelector((state: RootState) => state.auth.user);
     const isAdmin = user?.role === "admin";
-    const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
     useEffect(() => {
         const fetchProduct = async () => {

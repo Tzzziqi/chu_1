@@ -100,7 +100,7 @@ const checkout = async (req, res, next) => {
         const cartItems = await Cart.find({ user: userId }).populate('product').session(session);
 
         if (cartItems.length === 0) {
-            throw new Error("Empty cart");
+            throw new Error("Empty cart!");
         }
 
         const outOfStockItems = [];

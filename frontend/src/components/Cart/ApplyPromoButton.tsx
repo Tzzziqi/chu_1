@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { getCartWithPromo } from "../../store/slices/cartSlice";
 import { Button, Input, Typography } from "antd";
+import styled from "styled-components";
 
 const { Text } = Typography;
 
@@ -15,24 +16,54 @@ const PromoCodeInput = () => {
     }
 
     return (
-        <div style={ { marginBottom: '24px' } }>
-            <Text type="secondary"
-                  style={ { fontSize: '13px', display: 'block', marginBottom: '8px', color: '#8c8c8c' } }>
+        <Container>
+            <PromoLabel type="secondary">
                 Promo Code
-            </Text>
-            <div style={ { display: 'flex', gap: '8px' } }>
-                <Input placeholder="20 DOLLAR OFF" style={ { height: '42px' } } value={ promoCode }
+            </PromoLabel>
+            <InputContainer>
+                <InputBox placeholder="20 DOLLAR OFF" value={ promoCode }
                        onChange={ (e) => setPromoCode(e.target.value) }/>
-                <Button
+                <ApplyButton
                     type="primary"
                     onClick={ handleApply }
-                    style={ { height: '42px', padding: '0 25px', backgroundColor: '#5c67f2' } }
                 >
                     Apply
-                </Button>
-            </div>
-        </div>
+                </ApplyButton>
+            </InputContainer>
+        </Container>
     )
 };
 
 export default PromoCodeInput;
+
+const Container = styled.div`
+    margin-bottom: 24px;
+`;
+
+const PromoLabel = styled(Text)`
+    && {
+        front-size: 13px;
+        display: block;
+        margin-bottom: 8px;
+        color: #8c8c8c;
+    }
+`;
+
+const InputContainer = styled.div`
+    display: flex;
+    gap: 8px;
+`;
+
+const InputBox = styled(Input)`
+    && {
+        height: 42px;
+    }
+`;
+
+const ApplyButton = styled(Button)`
+    && {
+        height: 42px;
+        padding: 0 25px;
+        background-color: #5c67f2;
+    }
+`;

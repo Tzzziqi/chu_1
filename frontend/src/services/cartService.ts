@@ -1,4 +1,5 @@
 import axiosInstance from "../api/axiosInstance";
+import axios from "axios";
 
 
 export interface UpdateItemProps {
@@ -35,6 +36,18 @@ const cartService = {
             throw new Error(response.data.message || 'Failed to clear the cart!');
         }
         return response.data.cart;
+    },
+
+    checkout: async () => {
+        try {
+            const response = await axiosInstance.delete('/cart/checkout');
+            return response.data.cart;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const message = error.response?.data?.message || error.message || '';
+                throw new Error(message);
+            }
+        }
     }
 };
 

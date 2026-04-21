@@ -60,6 +60,20 @@ export const clearCart = createAsyncThunk(
     }
 );
 
+export const checkout = createAsyncThunk(
+    'cart/checkout',
+    async (_, thunkAPI) => {
+        try {
+            return await cartService.checkout();
+        } catch (error) {
+            if (error instanceof Error) {
+                return thunkAPI.rejectWithValue(error.message);
+            }
+            return thunkAPI.rejectWithValue('Unknown error');
+        }
+    }
+);
+
 interface CartState {
     items: CartItem[];
     backupItems: CartItem[];
@@ -90,10 +104,6 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        clearCartState: (state) => {
-            state.items = [];
-            state.summary = emptySummary;
-        },
         updateQuantityOptimistically: (state, action) => {
             const { productId, quantity, price, stock } = action.payload;
 
@@ -186,8 +196,22 @@ const cartSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.payload as string;
             })
+
+            // checkout
+            .addCase(checkout.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(checkout.fulfilled, (state) => {
+                state.status = 'succeeded';
+                state.items = []
+                state.summary = emptySummary;
+            })
+            .addCase(checkout.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload as string;
+            })
     },
 });
 
-export const { clearCartState, updateQuantityOptimistically } = cartSlice.actions;
+export const { updateQuantityOptimistically } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -129,7 +129,7 @@ const SelectorContainer = styled.div<{ $fromCart?: boolean }>`
 `;
 
 const QuantityValue = styled(Text)<{ $fromCart?: boolean }>`
-    &.ant-typography {
+    && {
         display: inline-block;
         white-space: nowrap;
         text-align: center;
@@ -157,15 +157,10 @@ const QuantityValue = styled(Text)<{ $fromCart?: boolean }>`
 `;
 
 const ActionButton = styled(Button)<{ $fromCart?: boolean }>`
-    &.ant-btn-text {
+    && {
         color: ${ props => (props.$fromCart ? 'inherit' : 'white') };
         display: flex;
         align-items: center;
         justify-content: center;
-
-        &:hover {
-            background-color: ${ props => (props.$fromCart ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.2)') } !important;
-            color: ${ props => (props.$fromCart ? '#5c67f2' : 'white') } !important;
-        }
     }
 `;

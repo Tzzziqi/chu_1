@@ -8,6 +8,7 @@ import AddToCartButton from "./AddToCartButton";
 import styled from "styled-components";
 import { clearCart } from "../../store/slices/cartSlice";
 import toast from "react-hot-toast";
+import Checkout from "./CheckoutButton";
 
 const { Text } = Typography;
 
@@ -72,53 +73,35 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
             closeIcon={ <CloseOutlined style={ { color: 'white' } }/> }
 
             footer={
-                <div style={ { padding: '12px 20px 20px 20px', backgroundColor: '#ffffff' } }>
+                <FooterContainer>
                     <PromoCodeInput/>
 
                     <Divider style={ { margin: '0 0 20px 0' } }/>
 
 
-                    <Space orientation="vertical" size={ 12 } style={ { width: '100%', marginBottom: '24px' } }>
-                        <div style={ { display: 'flex', justifyContent: 'space-between' } }>
-                            <Text style={ { color: '#8c8c8c' } }>Subtotal</Text>
+                    <StyledSpace orientation="vertical" size={ 12 }>
+                        <SummaryRow>
+                            <LabelText>Subtotal</LabelText>
                             <Text strong>${ summary.subtotal }</Text>
-                        </div>
-                        <div style={ { display: 'flex', justifyContent: 'space-between' } }>
-                            <Text style={ { color: '#8c8c8c' } }>Tax</Text>
+                        </SummaryRow>
+                        <SummaryRow>
+                            <LabelText>Tax</LabelText>
                             <Text strong>${ summary.tax }</Text>
-                        </div>
-                        <div style={ { display: 'flex', justifyContent: 'space-between' } }>
-                            <Text style={ { color: '#8c8c8c' } }>Discount</Text>
+                        </SummaryRow>
+                        <SummaryRow>
+                            <DiscountValue>Discount</DiscountValue>
                             <Text strong style={ { color: '#f5222d' } }>-${ summary.discount }</Text>
-                        </div>
-                    </Space>
+                        </SummaryRow>
+                    </StyledSpace>
 
-                    <div style={ {
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '24px'
-                    } }>
+                    <EstimatedTotalContainer>
                         <Text strong style={ { fontSize: '18px' } }>Estimated total</Text>
                         <Text strong style={ { fontSize: '24px' } }>${ summary.estimatedTotal }</Text>
-                    </div>
+                    </EstimatedTotalContainer>
 
+                    <Checkout/>
 
-                    <Button
-                        type="primary"
-                        block
-                        size="large"
-                        style={ {
-                            height: '56px',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            borderRadius: '8px',
-                            backgroundColor: '#5c67f2'
-                        } }
-                    >
-                        Continue to checkout
-                    </Button>
-                </div>
+                </FooterContainer>
             }
         >
             { status === 'loading' ? (
@@ -129,58 +112,22 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                 <List
                     dataSource={ items }
                     renderItem={ (item) => (
-                        <List.Item
-                            key={ item._id }
-                            style={ {
-                                padding: '16px',
-                                border: '1px solid #f0f0f0',
-                                borderRadius: '12px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                                marginBottom: '16px',
-                                backgroundColor: '#fff',
-                            } }
-                        >
-                            <div style={ { display: 'flex', gap: '16px', width: '100%' } }>
-                                <div style={ {
-                                    width: '90px',
-                                    height: '90px',
-                                    background: '#f5f5f5',
-                                    borderRadius: '4px',
-                                    overflow: 'hidden',
-                                    flexShrink: 0
-                                } }>
-                                    <img src={ item.product.imageUrl } alt={ item.product.name }
-                                         style={ { width: '100%', height: '100%', objectFit: 'contain' } }/>
-                                </div>
+                        <ListItemContainer key={ item._id }>
+                            <ItemCardContainer>
+                                <ImageContainer>
+                                    <ProductImage src={ item.product.imageUrl } alt={ item.product.name }/>
+                                </ImageContainer>
 
 
-                                <div style={ { flex: 1 } }>
-                                    <div style={ {
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'flex-start',
-                                        marginBottom: '12px'
-                                    } }>
-                                        <Text strong
-                                              style={ {
-                                                  fontSize: '15px',
-                                                  maxWidth: '200px'
-                                              } }>{ item.product.name }</Text>
-                                        <Text style={ {
-                                            color: '#5c67f2',
-                                            fontWeight: 'bold',
-                                            fontSize: '16px',
-                                            whiteSpace: 'nowrap'
-                                        } }>
+                                <ContentWrapper>
+                                    <DetailRow>
+                                        <ProductName>{ item.product.name }</ProductName>
+                                        <PriceText>
                                             ${ (parseFloat(item.product.price) * item.quantity).toFixed(2) }
-                                        </Text>
-                                    </div>
+                                        </PriceText>
+                                    </DetailRow>
 
-                                    <div style={ {
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center'
-                                    } }>
+                                    <ActionRow>
                                         <AddToCartButton
                                             productId={ item.product._id }
                                             price={ Number(item.product.price) }
@@ -191,10 +138,10 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                                         <RemoveItem
                                             productId={ item.product._id }
                                         />
-                                    </div>
-                                </div>
-                            </div>
-                        </List.Item>
+                                    </ActionRow>
+                                </ContentWrapper>
+                            </ItemCardContainer>
+                        </ListItemContainer>
                     ) }
                 />
             ) }
@@ -212,7 +159,7 @@ const TitleText = styled.div`
 `;
 
 const ClearButton = styled(Button)`
-    &.ant-btn-text {
+    && {
         color: rgba(255, 255, 255, 0.85);
         font-size: 13px;
         padding: 0 8px;
@@ -234,4 +181,110 @@ const HeaderContainer = styled.div`
     align-items: center;
     width: 100%;
     padding-right: 32px;
+`;
+
+const FooterContainer = styled.div`
+    padding: 12px 20px 20px 20px;
+    background-color: '#ffffff'
+`;
+
+const StyledSpace = styled(Space)`
+    && {
+        width: 100%;
+        margin-bottom: 24px;
+    }
+`;
+
+const SummaryRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const LabelText = styled(Text)`
+    && {
+        color: #8c8c8c;
+    }
+`;
+
+const DiscountValue = styled(Text)`
+    && {
+        color: #f5222d;
+    }
+`;
+
+const EstimatedTotalContainer = styled(Text)`
+    && {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+`;
+
+const ListItemContainer = styled(List.Item)`
+    && {
+        padding: 16px;
+        border: 1px solid #f0f0f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 16px;
+        background-color: #fff;
+    }
+`;
+
+const ItemCardContainer = styled.div`
+    display: flex;
+    gap: 16px;
+    width: 100%
+`;
+
+const ImageContainer = styled.div`
+    width: 90px;
+    height: 90px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0
+`;
+
+const ProductImage = styled.img`
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+`;
+
+const ContentWrapper = styled.div`
+    flex: 1;
+`;
+
+const DetailRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+`;
+
+const ActionRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const ProductName = styled(Text)`
+    && {
+        font-size: 15px;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+`;
+
+const PriceText = styled(Text)`
+    && {
+        color: #5c67f2;
+        font-weight: bold;
+        font-size: 16px;
+        white-space: nowrap;
+    }
 `;
