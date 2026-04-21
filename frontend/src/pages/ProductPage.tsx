@@ -223,9 +223,8 @@ function ProductPage() {
                             current={ page }
                             pageSize={ pageSize }
                             total={ total }
-                            onChange={ (nextPage, nextPageSize) => {
+                            onChange={ (nextPage) => {
                                 setPage(nextPage);
-                                setPageSize(nextPageSize);
                             } }
                         />
                     </div>
