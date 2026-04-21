@@ -8,6 +8,7 @@ import Header from "./components/common/header";
 import Footer from "./components/common/footer";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import ErrorPage from "./pages/ErrorPage";
 import { Toaster } from 'react-hot-toast';
 
 
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/signin" element={ <SignInPage/> }/>
                     <Route path="/signup" element={ <SignUpPage/> }/>
                     <Route path="/update-password" element={ <UpdatePasswordPage/> }/>
+                    <Route path="*" element={ <ErrorPage/> }/>
                 </Routes>
             </Content>
 

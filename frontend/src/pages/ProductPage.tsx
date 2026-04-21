@@ -34,26 +34,9 @@ function ProductPage() {
     const [page, setPage] = useState(1);
     const pageSize = 8;
     const [total, setTotal] = useState(0);
-    const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
     const navigate = useNavigate();
     const user = useSelector((state: RootState) => state.auth.user);
     const isAdmin = user?.role === "admin";
-    const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-
-
-    const handleDecrease = (productId: string) => {
-        setQuantityMap((prev) => ({
-            ...prev,
-            [productId]: Math.max((prev[productId] || 1) - 1, 1),
-        }));
-    };
-
-    const handleIncrease = (productId: string, stock: number) => {
-        setQuantityMap((prev) => ({
-            ...prev,
-            [productId]: Math.min((prev[productId] || 1) + 1, stock),
-        }));
-    };
 
     const fetchProducts = async () => {
         try {
@@ -69,14 +52,6 @@ function ProductPage() {
 
             setProducts(data.products);
             setTotal(data.total);
-
-            setQuantityMap((prev) => {
-                const nextQuantityMap: Record<string, number> = {};
-                data.products.forEach((product: Product) => {
-                    nextQuantityMap[product._id] = prev[product._id] || 1;
-                });
-                return nextQuantityMap;
-            });
         } catch (err) {
             console.error(err);
             setError("Failed to load products");
