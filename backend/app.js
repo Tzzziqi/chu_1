@@ -6,17 +6,15 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan'); 
 const mongoose = require('mongoose'); 
 const path = require("path");
-const uploadRouter = require("./routes/upload");
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection failed: ', err));
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
 const authRoutes = require('./routes/authRoutes');
 const productRouter = require('./routes/products');
 const cartRouter = require('./routes/cart');
+const uploadRouter = require('./routes/upload');
 
 const app = express();
 
@@ -27,8 +25,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use('/api', indexRouter);
-app.use('/api/users', usersRouter);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
