@@ -7,15 +7,15 @@ interface Props {
     adminOnly?: boolean
 }
 
-export default function ProtectedRoute({ children, adminOnly = false}: Props) {
-    const { isLoggedIn, user } = useSelector((state: RootState) =>state.auth)
+export default function ProtectedRoute({ children, adminOnly = false }: Props) {
+    const { isLoggedIn, user } = useSelector((state: RootState) => state.auth)
     if (!isLoggedIn) {
-        return <Navigate to='/signin' />
+        return <Navigate to='/signin'/>
     }
     // in case user is null, so use user?.role to get undefined
     if (adminOnly && user?.role !== 'admin') {
-        return <Navigate to="/" />
-  }
-  return <> {children} </>
+        return <Navigate to="/"/>
+    }
+    return <> { children } </>
 
 }

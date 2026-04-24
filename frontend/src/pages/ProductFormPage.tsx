@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { Alert, Card, Typography, message, Button, Space } from "antd";
+import { useEffect, useState } from "react";
+import { Alert, Button, Card, message, Space, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import ProductForm from "../components/ProductForm";
-import { createProduct, getProductById, updateProduct  } from "../api/productApi";
+import { createProduct, getProductById, updateProduct } from "../api/productApi";
 import type { ProductPayload } from "../types/product";
 
 const { Title } = Typography;
@@ -63,6 +63,7 @@ function ProductFormPage() {
           ← Back to Products
         </Button>
       </Space>
+
       <Card>
         <Title level={2}>{isEdit ? "Edit Product" : "Create Product"}</Title>
 
@@ -82,6 +83,5 @@ function ProductFormPage() {
     </div>
   );
 }
-
 
 export default ProductFormPage;
