@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { deleteProduct, getAllProducts } from "../api/productApi";
 import type { Product } from "../types/product";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store";
 import {
@@ -29,19 +29,28 @@ function ProductPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [search, setSearch] = useState("");
-    const [sort, setSort] = useState<"last_added" | "price_asc" | "price_desc">("last_added");
-    const [page, setPage] = useState(1);
+    
+    // const [search, setSearch] = useState("");
+    // const [sort, setSort] = useState<"last_added" | "price_asc" | "price_desc">("last_added");
+    // const [page, setPage] = useState(1);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const page = Number(searchParams.get("page")) || 1;
+    const search = searchParams.get("search") || "";
+    const sort =
+        (searchParams.get("sort") as "last_added" | "price_asc" | "price_desc") ||
+        "last_added";
+    
     const pageSize = 8;
     const [total, setTotal] = useState(0);
-    const navigate = useNavigate();
-    const user = useSelector((state: RootState) => state.auth.user);
-    const isAdmin = user?.role === "admin";
+    const navigate = useNavigate(); 
+    const user = useSelector((state: RootState) => state.auth.user); 
+    const isAdmin = user?.role === "admin"; 
 
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            setError("");
+    const fetchProducts = async () => { 
+        try { 
+            setLoading(true); 
+            setError(""); 
 
             const data = await getAllProducts({
                 page,
@@ -66,7 +75,11 @@ function ProductPage() {
             message.success("Product deleted successfully");
 
             if (products.length === 1 && page > 1) {
-                setPage((prev) => prev - 1);
+                setSearchParams({
+                    page: String(page - 1),
+                    search,
+                    sort,
+                });
                 return;
             }
 
@@ -118,13 +131,19 @@ function ProductPage() {
                         placeholder="Search products"
                         allowClear
                         onSearch={ (value) => {
-                            setPage(1);
-                            setSearch(value.trim());
+                            setSearchParams({
+                                page: "1",
+                                search: value.trim(),
+                                sort,
+                            });
                         } }
                         onChange={ (e) => {
                             if (!e.target.value) {
-                                setPage(1);
-                                setSearch("");
+                                setSearchParams({
+                                    page: "1",
+                                    search: "",
+                                    sort,
+                                });
                             }
                         } }
                         style={ { width: 240 } }
@@ -134,8 +153,11 @@ function ProductPage() {
                         value={ sort }
                         style={ { width: 180 } }
                         onChange={ (value) => {
-                            setPage(1);
-                            setSort(value);
+                            setSearchParams({
+                                page: "1",
+                                search,
+                                sort: value,
+                            });
                         } }
                         options={ [
                             { value: "last_added", label: "Last added" },
@@ -224,7 +246,11 @@ function ProductPage() {
                             pageSize={ pageSize }
                             total={ total }
                             onChange={ (nextPage) => {
-                                setPage(nextPage);
+                                setSearchParams({
+                                    page: String(nextPage),
+                                    search,
+                                    sort,
+                                });
                             } }
                         />
                     </div>
